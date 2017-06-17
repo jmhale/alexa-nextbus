@@ -49,7 +49,7 @@ def on_launch(launch_request, session):
     """Called when the user launches the skill without specifying what they want."""
     print("on_launch requestId=" + launch_request['requestId'] +
           ", sessionId=" + session['sessionId'])
-    # Dispatch to your skill's launch
+
     return get_welcome_response()
 
 def on_intent(intent_request, session):
@@ -60,10 +60,11 @@ def on_intent(intent_request, session):
     intent = intent_request['intent']
     intent_name = intent_request['intent']['name']
 
-    # Dispatch to your skill's intent handlers
-    if intent_name == "get_buses_intent":
+    print intent_name
+
+    if intent_name == "GetBusesIntent":
         return handle_get_buses_request(intent, session)
-    elif intent_name == "set_home_stop_intent":
+    elif intent_name == "SetHomeIntent":
         return handle_set_home_stop_request(intent, session)
 
 def get_welcome_response():
@@ -82,7 +83,6 @@ def on_session_ended(session_ended_request, session):
     """
     print("on_session_ended requestId=" + session_ended_request['requestId'] +
           ", sessionId=" + session['sessionId'])
-    # add cleanup logic here
 
 def set_home_stop(user_id, stop_id):
     """ Sets the home stop ID for a user in DynamoDB """
@@ -91,8 +91,8 @@ def set_home_stop(user_id, stop_id):
         client.put_item(
             TableName='alexa-nextbus',
             Item={
-                'UserID': user_id,
-                'StopID': stop_id
+                'userId': {'S':user_id},
+                'stopId': {'S':stop_id}
             }
         )
     except ClientError as ex:
@@ -108,9 +108,9 @@ def get_home_stop(user_id):
         stop_id = client.get_item(
             TableName='alexa-nextbus',
             Key={
-                'UserID': user_id
+                'userId': {'S':user_id}
             }
-        )
+        )['Item']['stopId']['S']
     except ClientError as ex:
         print ex.response
         return ex.response['Error']['Code']
@@ -122,7 +122,9 @@ def handle_get_buses_request(intent, session):
     attributes = {}
     should_end_session = True
 
-    stop_id = '1001810'
+    user_id = session['user']['userId']
+    stop_id = get_home_stop(user_id)
+
     events = api.get_events(stop_id)
     stop_name = events['StopName']
 
@@ -135,16 +137,18 @@ def handle_get_buses_request(intent, session):
     for bus_prediction in events['Predictions']:
         response += "%s "% helpers.build_event_response(bus_prediction)
 
-    return helpers.build_response(attributes, helpers.build_speechlet_noreprompt_nocard(
-        response, should_end_session))
+    return helpers.build_response(attributes,
+                                  helpers.build_speechlet_noreprompt_nocard(
+                                      response, should_end_session)
+                                 )
 
 def handle_set_home_stop_request(intent, session):
     """ Handles the request for set_home_stop intent """
     attributes = {}
     should_end_session = True
 
-    stop_id = intent['slots']['stop_id']['value']
     user_id = session['user']['userId']
+    stop_id = intent['slots']['stop_id']['id']
 
     set_resp = set_home_stop(user_id, stop_id)
 
@@ -153,6 +157,7 @@ def handle_set_home_stop_request(intent, session):
     else:
         response = "Your home stop was set successfully."
 
-    return helpers.build_response(attributes, helpers.build_speechlet_noreprompt_nocard(
-        response, should_end_session
-    ))
+    return helpers.build_response(attributes,
+                                  helpers.build_speechlet_noreprompt_nocard(
+                                      response, should_end_session)
+                                 )
