@@ -2,8 +2,8 @@
 Lambda function for WMATA's NextBus
 """
 
-import helpers
-import wmata_api
+import nextbus_alexa.helpers as helpers
+import nextbus_alexa.wmata_api as api
 
 NUM_BUSES = 5
 SKILL_NAME = "WMATA NextBus"
@@ -81,6 +81,7 @@ def on_session_ended(session_ended_request, session):
     # add cleanup logic here
 
 def handle_get_buses_request(intent, session):
+    """ Handles the request for get_buses_intent """
     attributes = {}
     should_end_session = True
 

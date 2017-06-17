@@ -1,0 +1,28 @@
+{
+  "session": {
+    "sessionId": "SessionId.91b5adac-fef2-4be1-9c3a-dbedddfc48ed",
+    "application": {
+      "applicationId": "amzn1.ask.skill.772be061-ea48-4d89-918e-5a621b847057"
+    },
+    "attributes": {},
+    "user": {
+      "userId": "amzn1.ask.account.AFKAGWXEOASSGZY7ZWQIHKBZ7MGCE7GSFN226RZECHJ5XHZHCCENPJCIOJLRCVLVKLPFHUEJH6FEGTCVIEM3GGWMEG2N43IN7TYUBEERCLYYA2R22PEC2QIXGRLQCS7FPYFSX7IWN4KI7AY7LNLYOPJ2P5XG5M6HAPAER5YYPEMKK5R4TEGSVRYUGLFV6GAYIGQXKDTYOL4UJ5Q"
+    },
+    "new": true
+  },
+  "request": {
+    "type": "IntentRequest",
+    "requestId": "EdwRequestId.9508672e-a901-491e-94d7-6f9f62b75b0d",
+    "locale": "en-US",
+    "timestamp": "2017-06-17T13:00:34Z",
+    "intent": {
+      "name": "get_buses_intent",
+      "slots": {
+        "stop_id": {
+          "name": "stop_id"
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}
