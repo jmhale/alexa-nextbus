@@ -4,6 +4,8 @@ Lambda function for WMATA's NextBus
 
 import helpers as helpers
 import wmata_api as api
+import boto3
+from botocore.exceptions import ClientError
 
 NUM_BUSES = 5
 SKILL_NAME = "WMATA NextBus"
@@ -61,6 +63,8 @@ def on_intent(intent_request, session):
     # Dispatch to your skill's intent handlers
     if intent_name == "get_buses_intent":
         return handle_get_buses_request(intent, session)
+    elif intent_name == "set_home_stop_intent":
+        return handle_set_home_stop_request(intent, session)
 
 def get_welcome_response():
     """ Default response """
@@ -80,12 +84,43 @@ def on_session_ended(session_ended_request, session):
           ", sessionId=" + session['sessionId'])
     # add cleanup logic here
 
+def set_home_stop(user_id, stop_id):
+    """ Sets the home stop ID for a user in DynamoDB """
+    try:
+        client = boto3.client('dynamodb')
+        client.put_item(
+            TableName='alexa-nextbus',
+            Item={
+                'UserID': user_id,
+                'StopID': stop_id
+            }
+        )
+    except ClientError as ex:
+        print ex.response
+        return ex.response['Error']['Code']
+
+    return None
+
+def get_home_stop(user_id):
+    """ Gets the home stop ID for a user in DynamoDB """
+    try:
+        client = boto3.client('dynamodb')
+        stop_id = client.get_item(
+            TableName='alexa-nextbus',
+            Key={
+                'UserID': user_id
+            }
+        )
+    except ClientError as ex:
+        print ex.response
+        return ex.response['Error']['Code']
+
+    return stop_id
+
 def handle_get_buses_request(intent, session):
     """ Handles the request for get_buses_intent """
     attributes = {}
     should_end_session = True
-
-    # not_supported_resp = "I'm sorry. No buses are coming. You will die of old age at the bus stop."
 
     stop_id = '1001810'
     events = api.get_events(stop_id)
@@ -100,9 +135,24 @@ def handle_get_buses_request(intent, session):
     for bus_prediction in events['Predictions']:
         response += "%s "% helpers.build_event_response(bus_prediction)
 
-    # print response
-
-    # print intent['slots']['stop_id']['value']
-
     return helpers.build_response(attributes, helpers.build_speechlet_noreprompt_nocard(
         response, should_end_session))
+
+def handle_set_home_stop_request(intent, session):
+    """ Handles the request for set_home_stop intent """
+    attributes = {}
+    should_end_session = True
+
+    stop_id = intent['slots']['stop_id']['value']
+    user_id = session['user']['userId']
+
+    set_resp = set_home_stop(user_id, stop_id)
+
+    if set_resp is not None:
+        response = "There was a problem setting your home stop."
+    else:
+        response = "Your home stop was set successfully."
+
+    return helpers.build_response(attributes, helpers.build_speechlet_noreprompt_nocard(
+        response, should_end_session
+    ))
