@@ -1,2 +1,3 @@
 *.pyc
 output.json
+nextbus_alexa/config.py
