@@ -2,8 +2,8 @@
 Lambda function for WMATA's NextBus
 """
 
-import nextbus_alexa.helpers as helpers
-import nextbus_alexa.wmata_api as api
+import helpers as helpers
+import wmata_api as api
 
 NUM_BUSES = 5
 SKILL_NAME = "WMATA NextBus"
@@ -85,8 +85,7 @@ def handle_get_buses_request(intent, session):
     attributes = {}
     should_end_session = True
 
-    not_supported_resp = "I'm sorry. No buses are coming. You will die of old age\
-      at the bus stop."
+    # not_supported_resp = "I'm sorry. No buses are coming. You will die of old age at the bus stop."
 
     stop_id = '1001810'
     events = api.get_events(stop_id)
