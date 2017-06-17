@@ -88,5 +88,22 @@ def handle_get_buses_request(intent, session):
     not_supported_resp = "I'm sorry. No buses are coming. You will die of old age\
       at the bus stop."
 
-    return helpers.build_response(attributes, helpers.build_speechlet_noreprompt(
-        SKILL_NAME, not_supported_resp, should_end_session))
+    stop_id = '1001810'
+    events = api.get_events(stop_id)
+    stop_name = events['StopName']
+
+    response = ''
+
+    stop_name = helpers.normalize_output(stop_name)
+
+    response += "For the stop at %s: " % stop_name
+
+    for bus_prediction in events['Predictions']:
+        response += "%s "% helpers.build_event_response(bus_prediction)
+
+    # print response
+
+    # print intent['slots']['stop_id']['value']
+
+    return helpers.build_response(attributes, helpers.build_speechlet_noreprompt_nocard(
+        response, should_end_session))
