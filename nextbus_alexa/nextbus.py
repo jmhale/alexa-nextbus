@@ -52,6 +52,8 @@ def on_launch(launch_request, session):
     print("on_launch requestId=" + launch_request['requestId'] +
           ", sessionId=" + session['sessionId'])
 
+    print "request: %s" % launch_request
+
     return get_welcome_response()
 
 def on_intent(intent_request, session):
@@ -117,6 +119,10 @@ def get_home_stop(user_id):
         print ex.response
         return ex.response['Error']['Code']
 
+    except KeyError as ex:
+        print ex
+        return -1
+
     return stop_id
 
 def handle_get_buses_request(intent, session):
@@ -126,6 +132,13 @@ def handle_get_buses_request(intent, session):
 
     user_id = session['user']['userId']
     stop_id = get_home_stop(user_id)
+
+    if stop_id == -1:
+        response = "No stop has been set for your user. Please set a home stop first."
+        return helpers.build_response(attributes,
+                                      helpers.build_speechlet_noreprompt_nocard(
+                                          response, should_end_session)
+                                     )
 
     events = api.get_events(stop_id)
     stop_name = events['StopName']
@@ -150,7 +163,14 @@ def handle_set_home_stop_request(intent, session):
     should_end_session = True
 
     user_id = session['user']['userId']
-    stop_id = intent['slots']['stop_id']['id']
+    try:
+        stop_id = intent['slots']['stop_id']['value']
+    except KeyError:
+        response = "No stop id was detected in your response. Please file a bug report on github."
+        return helpers.build_response(attributes,
+                                      helpers.build_speechlet_noreprompt_nocard(
+                                          response, should_end_session)
+                                     )
 
     set_resp = set_home_stop(user_id, stop_id)
 
