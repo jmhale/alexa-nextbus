@@ -93,7 +93,7 @@ def on_session_ended(session_ended_request, session):
 def set_home_stop(user_id, stop_id):
     """ Sets the home stop ID for a user in DynamoDB """
     seconds_to_keep = 86400 * DAYS_TO_KEEP
-    ttl = str(time.time() + seconds_to_keep).split('.')[0]
+    expires = str(time.time() + seconds_to_keep).split('.')[0]
     try:
         client = boto3.client('dynamodb')
         client.put_item(
@@ -101,7 +101,7 @@ def set_home_stop(user_id, stop_id):
             Item={
                 'userId': {'S':user_id},
                 'stopId': {'S':stop_id},
-                'ttl': {'N':ttl}
+                'expires': {'N':expires}
             }
         )
     except ClientError as ex:
@@ -113,9 +113,9 @@ def set_home_stop(user_id, stop_id):
 def get_home_stop(user_id):
     """ Gets the home stop ID for a user in DynamoDB """
     seconds_to_keep = 86400 * DAYS_TO_KEEP
-    ttl = str(time.time() + seconds_to_keep).split('.')[0]
+    expires = str(time.time() + seconds_to_keep).split('.')[0]
+    client = boto3.client('dynamodb')
     try:
-        client = boto3.client('dynamodb')
         stop_id = client.get_item(
             TableName='alexa-nextbus',
             Key={
@@ -136,11 +136,10 @@ def get_home_stop(user_id):
             Key={
                 'userId':{'S':user_id}
             },
-            UpdateExpression="set ttl = :t",
+            UpdateExpression="set expires = :t",
             ExpressionAttributeValues={
-                ':t': ttl
-            },
-            ReturnValues="UPDATED_NEW"
+                ':t': {'N':expires}
+            }
         )
     except ClientError as ex:
         print ex.response
