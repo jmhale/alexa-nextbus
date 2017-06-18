@@ -12,6 +12,7 @@ from botocore.exceptions import ClientError
 
 NUM_BUSES = 5
 SKILL_NAME = "WMATA NextBus"
+DAYS_TO_KEEP = 90
 
 def lambda_handler(event, context):
     """
@@ -74,7 +75,7 @@ def on_intent(intent_request, session):
 
 def get_welcome_response():
     """ Default response """
-    intro = "Welcome to {}. I am not yet complete.".format(SKILL_NAME)
+    intro = "Welcome to {}. I am not yet complete.".format(SKILL_NAME) ##TODO: Update this
     should_end_session = True
     attributes = {"speech_output": intro}
 
@@ -91,8 +92,7 @@ def on_session_ended(session_ended_request, session):
 
 def set_home_stop(user_id, stop_id):
     """ Sets the home stop ID for a user in DynamoDB """
-    days_to_keep = 90
-    seconds_to_keep = 86400 * days_to_keep
+    seconds_to_keep = 86400 * DAYS_TO_KEEP
     ttl = str(time.time() + seconds_to_keep).split('.')[0]
     try:
         client = boto3.client('dynamodb')
