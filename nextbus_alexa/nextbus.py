@@ -5,32 +5,23 @@ Lambda function for WMATA's NextBus
 """
 
 import time
-import helpers as helpers
-import wmata_api as api
 import boto3
 from botocore.exceptions import ClientError
+import helpers as helpers
+import wmata_api as api
+from config import ALEXA_APP_ID as app_id
 
 NUM_BUSES = 5
 SKILL_NAME = "WMATA NextBus"
 DAYS_TO_KEEP = 90
 
 def lambda_handler(event, context):
-    """
-    Route the incoming request based on type (LaunchRequest, IntentRequest, etc).
-    The JSON body of the request is provided in the event parameter.
-    """
+
     print("event.session.application.applicationId=" +
           event['session']['application']['applicationId'])
 
-    """
-    Uncomment this if statement and populate with your skill's application ID
-    to prevent someone else from configuring a skill that sends requests
-    to this function.
-    """
-    # if (event['session']['application']['applicationId'] !=
-    #         "amzn1.echo-sdk-ams.app.[unique-value-here]"):
-    #     raise ValueError("Invalid Application ID")
-
+    if event['session']['application']['applicationId'] != app_id:
+        raise ValueError("Invalid Application ID")
 
     if event['session']['new']:
         on_session_started({'requestId': event['request']['requestId']},
