@@ -1,5 +1,5 @@
 """
-Helpers to build Alexa responses
+Helper functions
 """
 
 import time
@@ -39,7 +39,7 @@ def build_event_response(bus_prediction):
 
 
 def build_speechlet(output, should_end_session):
-    """ Builds a speechlet with a card and without reprompt """
+    """ Builds a speechlet """
     return {
         'outputSpeech': {
             'type': 'PlainText',

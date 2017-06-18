@@ -1,3 +1,4 @@
+# pylint: disable=W0403
 """
 Provides helper functions for dealing with the WMATA API
 """
