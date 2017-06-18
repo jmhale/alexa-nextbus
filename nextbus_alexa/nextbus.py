@@ -16,7 +16,7 @@ SKILL_NAME = "Bus Predictor"
 DAYS_TO_KEEP = 90
 
 def lambda_handler(event, context):
-
+    """ Default entrypoint for Lambda function """
     print("event.session.application.applicationId=" +
           event['session']['application']['applicationId'])
 
@@ -77,13 +77,11 @@ Make sure that you set a home stop before using for the first time.
         SKILL_NAME, intro, should_end_session))
 
 def on_session_ended(session_ended_request, session):
-    """
-    Called when the user ends the session.
-    Is not called when the skill returns should_end_session=true
-    """
+    """ Called when session is explicitly ended by the user """
     print("on_session_ended requestId=" + session_ended_request['requestId'] +
           ", sessionId=" + session['sessionId'])
 
+## Helpers for getting/setting home stop
 def set_home_stop(user_id, stop_id):
     """ Sets the home stop ID for a user in DynamoDB """
     seconds_to_keep = 86400 * DAYS_TO_KEEP
@@ -145,6 +143,7 @@ def get_home_stop(user_id):
 
     return stop_id
 
+## Request handlers
 def handle_get_buses_request(intent, session):
     """ Handles the request for get_buses_intent """
     attributes = {}
