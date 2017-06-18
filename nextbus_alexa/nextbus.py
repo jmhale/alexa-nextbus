@@ -4,6 +4,7 @@
 Lambda function for WMATA's NextBus
 """
 
+import time
 import helpers as helpers
 import wmata_api as api
 import boto3
@@ -90,13 +91,17 @@ def on_session_ended(session_ended_request, session):
 
 def set_home_stop(user_id, stop_id):
     """ Sets the home stop ID for a user in DynamoDB """
+    days_to_keep = 90
+    seconds_to_keep = 86400 * days_to_keep
+    ttl = str(time.time() + seconds_to_keep).split('.')[0]
     try:
         client = boto3.client('dynamodb')
         client.put_item(
             TableName='alexa-nextbus',
             Item={
                 'userId': {'S':user_id},
-                'stopId': {'S':stop_id}
+                'stopId': {'S':stop_id},
+                'ttl': {'N':ttl}
             }
         )
     except ClientError as ex:
