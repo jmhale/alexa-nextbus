@@ -11,4 +11,4 @@ Note that you will need the following environment variables to be set for the ap
 
 If you save these env vars in your Lambda config, I highly recommend that you use KMS to encrypt them, as they are both potentially sensitive pieces of information.
 
-This is an independently developed app and is in no way, shape or form connected to, affiliated with, or maintained by the Washington Metropolitan Area Transit Authority
+Disclaimer: This is an independently developed app and is in no way, shape or form connected to, affiliated with, or maintained by the Washington Metropolitan Area Transit Authority
