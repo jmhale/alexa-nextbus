@@ -2,7 +2,9 @@
 
 This app provides real-time bus arrival information on a Amazon's Echo, using WMATA's public API.
 
-It is intended to be deployed as a Lambda function on AWS.
+It is intended to be deployed as a Lambda function on AWS and uses DynamoDB to store users' home stop ID, based on their Amazon Echo user ID.
+
+Before the initial "Get stop" request is made, a home stop ID must be set, using the SetHomeIntent intent.
 
 Note that you will need the following environment variables to be set for the app to function:
 
