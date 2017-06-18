@@ -4,10 +4,12 @@
 Lambda function for WMATA's NextBus
 """
 
+import os
+from base64 import b64decode
 from helpers import build_speechlet, build_event_response, build_response, \
     get_home_stop, set_home_stop, normalize_output
 import wmata_api as api
-from config import ALEXA_APP_ID as app_id
+import boto3
 
 NUM_BUSES = 5
 SKILL_NAME = "Bus Predictor"
@@ -16,6 +18,14 @@ def lambda_handler(event, context):
     """ Default entrypoint for Lambda function """
     print("event.session.application.applicationId=" +
           event['session']['application']['applicationId'])
+
+    if "ALEXA_APP_ID" in os.environ:
+        encrypted_app_id = os.environ['ALEXA_APP_ID']
+        app_id = boto3.client('kms').decrypt(
+            CiphertextBlob=b64decode(encrypted_app_id)
+        )['Plaintext']
+    else:
+        raise ValueError("Alexa app ID not provided. Cannot continue.")
 
     if event['session']['application']['applicationId'] != app_id:
         raise ValueError("Invalid Application ID")
