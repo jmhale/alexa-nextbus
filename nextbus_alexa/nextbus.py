@@ -112,6 +112,8 @@ def set_home_stop(user_id, stop_id):
 
 def get_home_stop(user_id):
     """ Gets the home stop ID for a user in DynamoDB """
+    seconds_to_keep = 86400 * DAYS_TO_KEEP
+    ttl = str(time.time() + seconds_to_keep).split('.')[0]
     try:
         client = boto3.client('dynamodb')
         stop_id = client.get_item(
@@ -120,6 +122,26 @@ def get_home_stop(user_id):
                 'userId': {'S':user_id}
             }
         )['Item']['stopId']['S']
+    except ClientError as ex:
+        print ex.response
+        return ex.response['Error']['Code']
+
+    except KeyError as ex:
+        print ex
+        return -1
+
+    try:
+        client.update_item(
+            TableName='alexa-nextbus',
+            Key={
+                'userId':{'S':user_id}
+            },
+            UpdateExpression="set ttl = :t",
+            ExpressionAttributeValues={
+                ':t': ttl
+            },
+            ReturnValues="UPDATED_NEW"
+        )
     except ClientError as ex:
         print ex.response
         return ex.response['Error']['Code']
