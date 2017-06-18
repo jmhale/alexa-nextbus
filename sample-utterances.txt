@@ -1,0 +1,5 @@
+GetBusesIntent for arrivals
+GetBusesIntent for arrival times
+GetBusesIntent for times
+GetBusesIntent when is the next bus coming
+SetHomeIntent to set my stop as {stop_id}
