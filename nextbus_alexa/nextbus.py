@@ -66,7 +66,10 @@ def on_intent(intent_request, session):
 
 def get_welcome_response():
     """ Default response """
-    intro = "Welcome to {}. I am not yet complete.".format(SKILL_NAME) ##TODO: Update this
+    intro = """
+Welcome to {} for Washington's Metro. \
+Make sure that you set a home stop before using for the first time.
+""".format(SKILL_NAME)
     should_end_session = True
     attributes = {"speech_output": intro}
 
