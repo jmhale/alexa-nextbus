@@ -12,7 +12,7 @@ import wmata_api as api
 from config import ALEXA_APP_ID as app_id
 
 NUM_BUSES = 5
-SKILL_NAME = "WMATA NextBus"
+SKILL_NAME = "Bus Predictor"
 DAYS_TO_KEEP = 90
 
 def lambda_handler(event, context):
