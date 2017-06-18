@@ -4,16 +4,13 @@
 Lambda function for WMATA's NextBus
 """
 
-import time
-import boto3
-from botocore.exceptions import ClientError
-import helpers as helpers
+from helpers import build_speechlet, build_event_response, build_response, \
+    get_home_stop, set_home_stop, normalize_output
 import wmata_api as api
 from config import ALEXA_APP_ID as app_id
 
 NUM_BUSES = 5
 SKILL_NAME = "Bus Predictor"
-DAYS_TO_KEEP = 90
 
 def lambda_handler(event, context):
     """ Default entrypoint for Lambda function """
@@ -73,75 +70,12 @@ Make sure that you set a home stop before using for the first time.
     should_end_session = True
     attributes = {"speech_output": intro}
 
-    return helpers.build_response(attributes, helpers.build_speechlet_noreprompt(
-        SKILL_NAME, intro, should_end_session))
+    return build_response(attributes, build_speechlet(intro, should_end_session))
 
 def on_session_ended(session_ended_request, session):
     """ Called when session is explicitly ended by the user """
     print("on_session_ended requestId=" + session_ended_request['requestId'] +
           ", sessionId=" + session['sessionId'])
-
-## Helpers for getting/setting home stop
-def set_home_stop(user_id, stop_id):
-    """ Sets the home stop ID for a user in DynamoDB """
-    seconds_to_keep = 86400 * DAYS_TO_KEEP
-    expires = str(time.time() + seconds_to_keep).split('.')[0]
-    try:
-        client = boto3.client('dynamodb')
-        client.put_item(
-            TableName='alexa-nextbus',
-            Item={
-                'userId': {'S':user_id},
-                'stopId': {'S':stop_id},
-                'expires': {'N':expires}
-            }
-        )
-    except ClientError as ex:
-        print ex.response
-        return ex.response['Error']['Code']
-
-    return None
-
-def get_home_stop(user_id):
-    """ Gets the home stop ID for a user in DynamoDB """
-    seconds_to_keep = 86400 * DAYS_TO_KEEP
-    expires = str(time.time() + seconds_to_keep).split('.')[0]
-    client = boto3.client('dynamodb')
-    try:
-        stop_id = client.get_item(
-            TableName='alexa-nextbus',
-            Key={
-                'userId': {'S':user_id}
-            }
-        )['Item']['stopId']['S']
-    except ClientError as ex:
-        print ex.response
-        return ex.response['Error']['Code']
-
-    except KeyError as ex:
-        print ex
-        return -1
-
-    try:
-        client.update_item(
-            TableName='alexa-nextbus',
-            Key={
-                'userId':{'S':user_id}
-            },
-            UpdateExpression="set expires = :t",
-            ExpressionAttributeValues={
-                ':t': {'N':expires}
-            }
-        )
-    except ClientError as ex:
-        print ex.response
-        return ex.response['Error']['Code']
-
-    except KeyError as ex:
-        print ex
-        return -1
-
-    return stop_id
 
 ## Request handlers
 def handle_get_buses_request(intent, session):
@@ -154,27 +88,25 @@ def handle_get_buses_request(intent, session):
 
     if stop_id == -1:
         response = "No stop has been set for your user. Please set a home stop first."
-        return helpers.build_response(attributes,
-                                      helpers.build_speechlet_noreprompt_nocard(
-                                          response, should_end_session)
-                                     )
+        return build_response(attributes,
+                              build_speechlet(response, should_end_session)
+                             )
 
     events = api.get_events(stop_id)
     stop_name = events['StopName']
 
     response = ''
 
-    stop_name = helpers.normalize_output(stop_name)
+    stop_name = normalize_output(stop_name)
 
     response += "For the stop at %s: " % stop_name
 
     for bus_prediction in events['Predictions']:
-        response += "%s "% helpers.build_event_response(bus_prediction)
+        response += "%s "% build_event_response(bus_prediction)
 
-    return helpers.build_response(attributes,
-                                  helpers.build_speechlet_noreprompt_nocard(
-                                      response, should_end_session)
-                                 )
+    return build_response(attributes,
+                          build_speechlet(response, should_end_session)
+                         )
 
 def handle_set_home_stop_request(intent, session):
     """ Handles the request for set_home_stop intent """
@@ -186,10 +118,9 @@ def handle_set_home_stop_request(intent, session):
         stop_id = intent['slots']['stop_id']['value']
     except KeyError:
         response = "No stop id was detected in your response. Please file a bug report on github."
-        return helpers.build_response(attributes,
-                                      helpers.build_speechlet_noreprompt_nocard(
-                                          response, should_end_session)
-                                     )
+        return build_response(attributes,
+                              build_speechlet(response, should_end_session)
+                             )
 
     set_resp = set_home_stop(user_id, stop_id)
 
@@ -198,7 +129,6 @@ def handle_set_home_stop_request(intent, session):
     else:
         response = "Your home stop was set successfully."
 
-    return helpers.build_response(attributes,
-                                  helpers.build_speechlet_noreprompt_nocard(
-                                      response, should_end_session)
-                                 )
+    return build_response(attributes,
+                          build_speechlet(response, should_end_session)
+                         )

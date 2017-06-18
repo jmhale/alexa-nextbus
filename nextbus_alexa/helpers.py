@@ -2,6 +2,12 @@
 Helpers to build Alexa responses
 """
 
+import time
+import boto3
+from botocore.exceptions import ClientError
+
+DAYS_TO_KEEP = 90
+
 def normalize_output(event_text):
     """ Normalizes the output to sound more natural """
     normalized_text = event_text.replace('St', 'Street')\
@@ -50,3 +56,65 @@ def build_response(attributes, speechlet_response):
         'sessionAttributes': attributes,
         'response': speechlet_response
     }
+
+## Helpers for getting/setting home stop
+def set_home_stop(user_id, stop_id):
+    """ Sets the home stop ID for a user in DynamoDB """
+    seconds_to_keep = 86400 * DAYS_TO_KEEP
+    expires = str(time.time() + seconds_to_keep).split('.')[0]
+    try:
+        client = boto3.client('dynamodb')
+        client.put_item(
+            TableName='alexa-nextbus',
+            Item={
+                'userId': {'S':user_id},
+                'stopId': {'S':stop_id},
+                'expires': {'N':expires}
+            }
+        )
+    except ClientError as ex:
+        print ex.response
+        return ex.response['Error']['Code']
+
+    return None
+
+def get_home_stop(user_id):
+    """ Gets the home stop ID for a user in DynamoDB """
+    seconds_to_keep = 86400 * DAYS_TO_KEEP
+    expires = str(time.time() + seconds_to_keep).split('.')[0]
+    client = boto3.client('dynamodb')
+    try:
+        stop_id = client.get_item(
+            TableName='alexa-nextbus',
+            Key={
+                'userId': {'S':user_id}
+            }
+        )['Item']['stopId']['S']
+    except ClientError as ex:
+        print ex.response
+        return ex.response['Error']['Code']
+
+    except KeyError as ex:
+        print ex
+        return -1
+
+    try:
+        client.update_item(
+            TableName='alexa-nextbus',
+            Key={
+                'userId':{'S':user_id}
+            },
+            UpdateExpression="set expires = :t",
+            ExpressionAttributeValues={
+                ':t': {'N':expires}
+            }
+        )
+    except ClientError as ex:
+        print ex.response
+        return ex.response['Error']['Code']
+
+    except KeyError as ex:
+        print ex
+        return -1
+
+    return stop_id
