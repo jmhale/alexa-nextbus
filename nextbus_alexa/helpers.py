@@ -53,6 +53,22 @@ def build_speechlet(output, should_end_session, ssml=False):
         },
         "shouldEndSession": should_end_session
     }
+
+
+def build_reprompt(output, reprompt_output, should_end_session):
+    """ Builds a reprompt speechlet """
+    return {
+        "outputSpeech": {
+            "type": "PlainText",
+            "text": output
+        },
+        "shouldEndSession": should_end_session,
+        "reprompt": {
+            "outputSpeech": {
+                "type": "PlainText",
+                "text": reprompt_output
+            }
+        }
     }
 
 

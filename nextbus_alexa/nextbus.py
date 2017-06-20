@@ -7,7 +7,7 @@ Lambda function for WMATA's NextBus
 import os
 from base64 import b64decode
 from helpers import build_speechlet, build_event_response, build_response, \
-    get_home_stop, set_home_stop, normalize_output
+    get_home_stop, set_home_stop, normalize_output, build_reprompt
 import wmata_api as api
 import boto3
 
@@ -47,22 +47,23 @@ def on_session_started(session_started_request, session):
           session_started_request['requestId'] + ", sessionId=" +
           session['sessionId'])
 
-def on_launch(launch_request, session):
+def on_launch(request, session):
     """Called when the user launches the skill without specifying what they want."""
-    print("on_launch requestId=" + launch_request['requestId'] +
+    print("on_launch requestId=" + request['requestId'] +
           ", sessionId=" + session['sessionId'])
 
-    print "request: %s" % launch_request
+    print "request: %s" % request
+    resp = get_welcome_response(request, session)
+    print "response: %s" % resp
+    return resp
 
-    return get_welcome_response()
-
-def on_intent(intent_request, session):
+def on_intent(request, session):
     """Called when the user specifies an intent for this skill."""
-    print("on_intent requestId=" + intent_request['requestId'] +
+    print("on_intent requestId=" + request['requestId'] +
           ", sessionId=" + session['sessionId'])
 
-    intent = intent_request['intent']
-    intent_name = intent_request['intent']['name']
+    intent = request['intent']
+    intent_name = request['intent']['name']
 
     print intent_name
 
@@ -71,20 +72,36 @@ def on_intent(intent_request, session):
     elif intent_name == "SetHomeIntent":
         return handle_set_home_stop_request(intent, session)
 
-def get_welcome_response():
+def get_welcome_response(request, session):
     """ Default response """
+
+    user_id = session['user']['userId']
+    stop_id = get_home_stop(user_id)
+
+    if stop_id == -1:
+        intro = """
+Welcome to %s for Washington's Metro. \
+No stop was detected for your user. Please say the ID you would like to use for your home stop.
+""" % SKILL_NAME
+
+        reprompt_text = ""
+        should_end_session = False
+        attributes = {"speech_output": intro}
+        return build_response(attributes, build_reprompt(intro, reprompt_text, should_end_session))
+
     intro = """
-Welcome to {} for Washington's Metro. \
-Make sure that you set a home stop before using for the first time.
-""".format(SKILL_NAME)
+<speak>
+Welcome to %s for Washington's Metro. \
+Your saved stop ID is <say-as interpret-as="digits">%s</say-as>
+</speak>
+""" % (SKILL_NAME, stop_id)
     should_end_session = True
     attributes = {"speech_output": intro}
+    return build_response(attributes, build_speechlet(intro, should_end_session, ssml=True))
 
-    return build_response(attributes, build_speechlet(intro, should_end_session))
-
-def on_session_ended(session_ended_request, session):
+def on_session_ended(request, session):
     """ Called when session is explicitly ended by the user """
-    print("on_session_ended requestId=" + session_ended_request['requestId'] +
+    print("on_session_ended requestId=" + request['requestId'] +
           ", sessionId=" + session['sessionId'])
 
 ## Request handlers
@@ -127,7 +144,7 @@ def handle_set_home_stop_request(intent, session):
     try:
         stop_id = intent['slots']['stop_id']['value']
     except KeyError:
-        response = "No stop id was detected in your response. Please file a bug report on github."
+        response = "I'm sorry. I didn't understand your stop id. Please file a bug report on github"
         return build_response(attributes,
                               build_speechlet(response, should_end_session)
                              )
