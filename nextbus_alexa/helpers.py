@@ -38,14 +38,21 @@ def build_event_response(bus_prediction):
                                                arrival_text)
 
 
-def build_speechlet(output, should_end_session):
+def build_speechlet(output, should_end_session, ssml=False):
     """ Builds a speechlet """
+    if ssml:
+        speech_type = "SSML"
+        text_type = "ssml"
+    else:
+        speech_type = "PlainText"
+        text_type = "text"
     return {
-        'outputSpeech': {
-            'type': 'PlainText',
-            'text': output
+        "outputSpeech": {
+            "type": speech_type,
+            text_type: output
         },
-        'shouldEndSession': should_end_session
+        "shouldEndSession": should_end_session
+    }
     }
 
 
