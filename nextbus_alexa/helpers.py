@@ -59,9 +59,9 @@ def build_speechlet(output, should_end_session, ssml=False):
 def build_response(attributes, speechlet_response):
     """ Builds the overall response """
     return {
-        'version': '1.0',
-        'sessionAttributes': attributes,
-        'response': speechlet_response
+        "version": "1.0",
+        "sessionAttributes": attributes,
+        "response": speechlet_response
     }
 
 ## Helpers for getting/setting home stop
