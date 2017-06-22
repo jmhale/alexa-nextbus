@@ -73,6 +73,8 @@ def on_intent(request, session):
         return handle_set_home_stop_request(intent, session)
     elif intent_name == "AMAZON.HelpIntent":
         return handle_help_request(intent, session)
+    elif intent_name == "AMAZON.CancelIntent" or intent_name == "AMAZON.StopIntent":
+        return handle_session_end_request()
 
 def get_welcome_response(request, session):
     """ Default response """
@@ -174,3 +176,11 @@ What would you like to do?"
     reprompt_text = ""
     attributes = {"speech_output": help_resp}
     return build_response(attributes, build_reprompt(help_resp, reprompt_text, should_end_session))
+
+def handle_session_end_request():
+    """ Handles a exit intent request """
+    attributes = {}
+    exit_resp = "Thank you for using bus predictor. " \
+                    "Goodbye! "
+    should_end_session = True
+    return build_response(attributes, build_speechlet(exit_resp, should_end_session))
