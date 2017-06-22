@@ -15,6 +15,16 @@ import boto3
 NUM_BUSES = 5
 SKILL_NAME = "Bus Predictor"
 
+## Static messages
+NO_STOP_MESSAGE = "You currently do not have a home stop set. \
+Please say the seven-digit ID you would like to use for your home stop."
+HELP_MESSAGE = "Bus predictor provides real-time arrival information for MetroBuses in the Washington D.C. area. \
+To get arrival times, you can say, ask metro bus for arrival times. \
+To set your home stop, you can say, ask metro bus to set my home stop as, then say the seven-digit stop id. \
+To exit bus predictor, just say, exit. \
+What would you like to do?"
+EXIT_MESSAGE = "Thank you for using bus predictor. Goodbye!"
+
 def lambda_handler(event, context):
     """ Default entrypoint for Lambda function """
     print("event.session.application.applicationId=" +
@@ -84,10 +94,7 @@ def get_welcome_response(request, session):
     stop_id = get_home_stop(user_id)
 
     if stop_id == -1:
-        intro = """
-Welcome to %s for Washington's Metro. \
-No stop was detected for your user. Please say the ID you would like to use for your home stop.
-""" % SKILL_NAME
+        intro = "Welcome to %s for Washington's Metro. %s" % (SKILL_NAME, NO_STOP_MESSAGE)
 
         reprompt_text = ""
         should_end_session = False
@@ -146,10 +153,8 @@ def handle_get_buses_request(intent, session):
     stop_id = get_home_stop(user_id)
 
     if stop_id == -1:
-        response = "No stop has been set for your user. Please set a home stop first."
-        return build_response(attributes,
-                              build_speechlet(response, should_end_session)
-                             )
+        response = NO_STOP_MESSAGE
+        return build_response(attributes, build_speechlet(response, False))
 
     arrivals = get_buses_response(stop_id)
     # events = api.get_events(stop_id)
@@ -199,21 +204,9 @@ Here are your stop's arrival times: %s
 
 def handle_help_request(intent, session):
     """ Handles a request for the help intent """
-    should_end_session = False
-    help_resp = "Bus predictor provides real-time arrival information for MetroBuses in the Washington D.C. area. \
-To get arrival times, you can say, ask metro bus for arrival times. \
-To set your home stop, you can say, ask metro bus to set my home stop as, then say the seven-digit stop id. \
-To exit bus predictor, just say, exit. \
-What would you like to do?"
-
-    reprompt_text = ""
-    attributes = {"speech_output": help_resp}
-    return build_response(attributes, build_reprompt(help_resp, reprompt_text, should_end_session))
+    attributes = {"speech_output": HELP_MESSAGE}
+    return build_response(attributes, build_reprompt(HELP_MESSAGE, "", False))
 
 def handle_session_end_request():
     """ Handles a exit intent request """
-    attributes = {}
-    exit_resp = "Thank you for using bus predictor. " \
-                    "Goodbye! "
-    should_end_session = True
-    return build_response(attributes, build_speechlet(exit_resp, should_end_session))
+    return build_response({}, build_speechlet(EXIT_MESSAGE, True))
