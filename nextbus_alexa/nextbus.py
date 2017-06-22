@@ -6,6 +6,7 @@ Lambda function for WMATA's NextBus
 
 import os
 from base64 import b64decode
+from urllib2 import HTTPError
 from helpers import build_speechlet, build_event_response, build_response, \
     get_home_stop, set_home_stop, normalize_output, build_reprompt
 import wmata_api as api
@@ -112,7 +113,16 @@ def on_session_ended(request, session):
 
 def get_buses_response(stop_id):
     """ Build a get buses response for a stop id """
-    events = api.get_events(stop_id)
+    try:
+        events = api.get_events(stop_id)
+    except HTTPError as ex:
+        if str(ex.code) == "400":
+            response = "I'm sorry. Your stop id is not valid. Please try to set your stop again by saying the seven-digit stop id."
+            return response, True
+
+        response = "I'm sorry. There was a problem accessing Metro's system. Please try again later."
+        return response, False
+
     stop_name = events['StopName']
 
     response = ''
