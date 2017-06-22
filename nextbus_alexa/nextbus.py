@@ -156,18 +156,6 @@ def handle_get_buses_request(intent, session):
         response = NO_STOP_MESSAGE
         return build_response(attributes, build_speechlet(response, False))
 
-    arrivals = get_buses_response(stop_id)
-    # events = api.get_events(stop_id)
-    # stop_name = events['StopName']
-    #
-    # response = ''
-    #
-    # stop_name = normalize_output(stop_name)
-    #
-    # response += "For the stop at %s: " % stop_name
-    #
-    # for bus_prediction in events['Predictions']:
-    #     response += "%s "% build_event_response(bus_prediction)
 
     return build_response(attributes,
                           build_speechlet(arrivals, should_end_session)
