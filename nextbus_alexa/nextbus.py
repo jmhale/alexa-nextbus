@@ -93,12 +93,14 @@ No stop was detected for your user. Please say the ID you would like to use for 
         attributes = {"speech_output": intro}
         return build_response(attributes, build_reprompt(intro, reprompt_text, should_end_session))
 
+    arrivals = get_buses_response(stop_id)
     intro = """
 <speak>
 Welcome to %s for Washington's Metro. \
-Your saved stop ID is <say-as interpret-as="digits">%s</say-as>
+Your saved stop ID is <say-as interpret-as="digits">%s</say-as>\
+Here are your stop's arrival times: %s
 </speak>
-""" % (SKILL_NAME, stop_id)
+""" % (SKILL_NAME, stop_id, arrivals)
     should_end_session = True
     attributes = {"speech_output": intro}
     return build_response(attributes, build_speechlet(intro, should_end_session, ssml=True))
