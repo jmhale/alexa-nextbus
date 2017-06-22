@@ -97,7 +97,7 @@ No stop was detected for your user. Please say the ID you would like to use for 
     intro = """
 <speak>
 Welcome to %s for Washington's Metro. \
-Your saved stop ID is <say-as interpret-as="digits">%s</say-as>\
+Your saved stop ID is <say-as interpret-as="digits">%s</say-as>. \
 Here are your stop's arrival times: %s
 </speak>
 """ % (SKILL_NAME, stop_id, arrivals)
@@ -167,7 +167,7 @@ def handle_set_home_stop_request(intent, session):
     try:
         stop_id = intent['slots']['stop_id']['value']
     except KeyError:
-        response = "I'm sorry. I didn't understand your stop id. Please file a bug report on github"
+        response = "I'm sorry. I didn't understand your stop id."
         return build_response(attributes,
                               build_speechlet(response, should_end_session)
                              )
@@ -177,19 +177,23 @@ def handle_set_home_stop_request(intent, session):
     if set_resp is not None:
         response = "There was a problem setting your home stop."
     else:
-        response = "Your home stop was set successfully."
+        arrivals = get_buses_response(stop_id)
+        response = """
+<speak>
+Your home stop was set successfully to <say-as interpret-as="digits">%s</say-as>. \
+Here are your stop's arrival times: %s
+</speak>
+""" % (stop_id, arrivals)
 
-    return build_response(attributes,
-                          build_speechlet(response, should_end_session)
-                         )
+    return build_response(attributes, build_speechlet(response, should_end_session, ssml=True))
 
 def handle_help_request(intent, session):
     """ Handles a request for the help intent """
     should_end_session = False
-    help_resp = "Bus predictor provides real-time arrival information for MetroBuses in the Washington D.C. area.\
-To get arrival times, you can say, ask metro bus for arrival times.\
-To set your home stop, you can say, ask metro bus to set my home stop, then say the seven-digit stop id.\
-To exit bus predictor, just say, exit.\
+    help_resp = "Bus predictor provides real-time arrival information for MetroBuses in the Washington D.C. area. \
+To get arrival times, you can say, ask metro bus for arrival times. \
+To set your home stop, you can say, ask metro bus to set my home stop as, then say the seven-digit stop id. \
+To exit bus predictor, just say, exit. \
 What would you like to do?"
 
     reprompt_text = ""
