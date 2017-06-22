@@ -108,7 +108,23 @@ def on_session_ended(request, session):
     print("on_session_ended requestId=" + request['requestId'] +
           ", sessionId=" + session['sessionId'])
 
-## Request handlers
+def get_buses_response(stop_id):
+    """ Build a get buses response for a stop id """
+    events = api.get_events(stop_id)
+    stop_name = events['StopName']
+
+    response = ''
+
+    stop_name = normalize_output(stop_name)
+
+    response += "For the stop at %s: " % stop_name
+
+    for bus_prediction in events['Predictions']:
+        response += "%s "% build_event_response(bus_prediction)
+
+    return response
+
+## Intent handlers
 def handle_get_buses_request(intent, session):
     """ Handles the request for get_buses_intent """
     attributes = {}
@@ -123,20 +139,21 @@ def handle_get_buses_request(intent, session):
                               build_speechlet(response, should_end_session)
                              )
 
-    events = api.get_events(stop_id)
-    stop_name = events['StopName']
-
-    response = ''
-
-    stop_name = normalize_output(stop_name)
-
-    response += "For the stop at %s: " % stop_name
-
-    for bus_prediction in events['Predictions']:
-        response += "%s "% build_event_response(bus_prediction)
+    arrivals = get_buses_response(stop_id)
+    # events = api.get_events(stop_id)
+    # stop_name = events['StopName']
+    #
+    # response = ''
+    #
+    # stop_name = normalize_output(stop_name)
+    #
+    # response += "For the stop at %s: " % stop_name
+    #
+    # for bus_prediction in events['Predictions']:
+    #     response += "%s "% build_event_response(bus_prediction)
 
     return build_response(attributes,
-                          build_speechlet(response, should_end_session)
+                          build_speechlet(arrivals, should_end_session)
                          )
 
 def handle_set_home_stop_request(intent, session):
