@@ -172,15 +172,13 @@ def handle_set_home_stop_request(intent, session):
     try:
         stop_id = intent['slots']['stop_id']['value']
     except KeyError:
-        response = "I'm sorry. I didn't understand your stop id."
-        return build_response(attributes,
-                              build_speechlet(response, should_end_session)
-                             )
+        response = "I'm sorry. I didn't understand your stop id. Please try again"
+        return build_response(attributes, build_speechlet(response, False))
 
     set_resp = set_home_stop(user_id, stop_id)
 
     if set_resp is not None:
-        response = "There was a problem setting your home stop."
+        response = "There was a problem setting your home stop. Please try again later."
     else:
         arrivals = get_buses_response(stop_id)
         response = """
