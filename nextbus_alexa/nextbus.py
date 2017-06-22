@@ -71,6 +71,8 @@ def on_intent(request, session):
         return handle_get_buses_request(intent, session)
     elif intent_name == "SetHomeIntent":
         return handle_set_home_stop_request(intent, session)
+    elif intent_name == "AMAZON.HelpIntent":
+        return handle_help_request(intent, session)
 
 def get_welcome_response(request, session):
     """ Default response """
@@ -159,3 +161,16 @@ def handle_set_home_stop_request(intent, session):
     return build_response(attributes,
                           build_speechlet(response, should_end_session)
                          )
+
+def handle_help_request(intent, session):
+    """ Handles a request for the help intent """
+    should_end_session = False
+    help_resp = "Bus predictor provides real-time arrival information for MetroBuses in the Washington D.C. area.\
+To get arrival times, you can say, ask metro bus for arrival times.\
+To set your home stop, you can say, ask metro bus to set my home stop, then say the seven-digit stop id.\
+To exit bus predictor, just say, exit.\
+What would you like to do?"
+
+    reprompt_text = ""
+    attributes = {"speech_output": help_resp}
+    return build_response(attributes, build_reprompt(help_resp, reprompt_text, should_end_session))
