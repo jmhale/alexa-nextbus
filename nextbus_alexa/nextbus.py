@@ -141,7 +141,7 @@ def get_buses_response(stop_id):
     for bus_prediction in events['Predictions']:
         response += "%s "% build_event_response(bus_prediction)
 
-    return response
+    return response, False
 
 ## Intent handlers
 def handle_get_buses_request(intent, session):
@@ -156,10 +156,12 @@ def handle_get_buses_request(intent, session):
         response = NO_STOP_MESSAGE
         return build_response(attributes, build_speechlet(response, False))
 
+    arrivals, reprompt = get_buses_response(stop_id)
 
-    return build_response(attributes,
-                          build_speechlet(arrivals, should_end_session)
-                         )
+    if reprompt:
+        return build_response(attributes, build_speechlet(arrivals, False))
+
+    return build_response(attributes, build_speechlet(arrivals, should_end_session))
 
 def handle_set_home_stop_request(intent, session):
     """ Handles the request for set_home_stop intent """
