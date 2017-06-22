@@ -1,4 +1,4 @@
-# pylint: disable=W0403,W0613
+# pylint: disable=W0403,W0613,C0301
 
 """
 Lambda function for WMATA's NextBus
