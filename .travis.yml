@@ -1,0 +1,23 @@
+deploy:
+- provider: lambda
+  function_name: alexa-nextbus-dev
+  region: us-east-1
+  role: arn:aws:iam::251236465048:role/service-role/alexa-wmata
+  runtime: python2.7
+  handler_name: nextbus.lambda_handler
+  access_key_id: AKIAJBHFEBXAI2TY45NQ
+  secret_access_key:
+    secure: O9cClVHRbIMJXuYBno8tj5th8hWaEkK5TXElMufn3gojK0LxyPN7CqY4iGpRVwVcbGrq6t3nk2H9P4xxOr2awQnIGpf66jSZl6J0s+m/lQUOVSkY37By2lPKj6Z3ojBW6QL8ZDdO6W+1gYl4JyQj7IOAbKSeF913RcaFch4cFQVkBDUv/9Ftq5GjIoHwFfQHnaQmHd8d4+thtQjlRypg3QG2wOqOijZQMb9j/ha+X9uB83jfyZu1zMeTBvMqyMnb6c8T/+pNJ/16Bs7yt+1iKD9ySsWTIatiZeukSnB3VE+caVnxnKuwPUjQFCr5wvmdwFmgAcl4hQfdKPQO2yVIHMvaz6HGlEk/vqik3SlsSv0J7x0BykUdGL/nociNB7BX8Z/cYj6Hok876zW/HSgjKokavN6Skjf6SZfDrYqb81q1ZS52m8WLLHBtwQdd3Yp6LR27en6xbAUN4FyTopxTvDyr5/WM8UBCgH9KfgB4BEHbHN8T4BhCP4pXbN1a7G4Cm26hcGDDHk2hIG/vi07UIYkGbObOdbtS5tTU0c2QRMX+EfxKG9t1lOHISceghogRUW1qFbyl4EhBDxEs3mlEdYPEZKi5Ym8mqE0EKpzGKDqFdJ1yTUhcsRPyQwJioNgbimmkpDP+ME5HHvdL7D5SLG0i1ZnTYldLx9U+QqUThRs=
+  on:
+    branch: master
+- provider: lambda
+  function_name: alexa-nextbus-prod
+  region: us-east-1
+  role: arn:aws:iam::251236465048:role/service-role/alexa-wmata
+  runtime: python2.7
+  handler_name: nextbus.lambda_handler
+  access_key_id: AKIAJBHFEBXAI2TY45NQ
+  secret_access_key:
+    secure: O9cClVHRbIMJXuYBno8tj5th8hWaEkK5TXElMufn3gojK0LxyPN7CqY4iGpRVwVcbGrq6t3nk2H9P4xxOr2awQnIGpf66jSZl6J0s+m/lQUOVSkY37By2lPKj6Z3ojBW6QL8ZDdO6W+1gYl4JyQj7IOAbKSeF913RcaFch4cFQVkBDUv/9Ftq5GjIoHwFfQHnaQmHd8d4+thtQjlRypg3QG2wOqOijZQMb9j/ha+X9uB83jfyZu1zMeTBvMqyMnb6c8T/+pNJ/16Bs7yt+1iKD9ySsWTIatiZeukSnB3VE+caVnxnKuwPUjQFCr5wvmdwFmgAcl4hQfdKPQO2yVIHMvaz6HGlEk/vqik3SlsSv0J7x0BykUdGL/nociNB7BX8Z/cYj6Hok876zW/HSgjKokavN6Skjf6SZfDrYqb81q1ZS52m8WLLHBtwQdd3Yp6LR27en6xbAUN4FyTopxTvDyr5/WM8UBCgH9KfgB4BEHbHN8T4BhCP4pXbN1a7G4Cm26hcGDDHk2hIG/vi07UIYkGbObOdbtS5tTU0c2QRMX+EfxKG9t1lOHISceghogRUW1qFbyl4EhBDxEs3mlEdYPEZKi5Ym8mqE0EKpzGKDqFdJ1yTUhcsRPyQwJioNgbimmkpDP+ME5HHvdL7D5SLG0i1ZnTYldLx9U+QqUThRs=
+  on:
+    branch: release
