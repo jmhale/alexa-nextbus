@@ -1,5 +1,11 @@
 # WMATA NextBus Predictor for Amazon's Echo
 
+Master:
+[![Build Status](https://travis-ci.org/jmhale/alexa-nextbus.svg?branch=master)](https://travis-ci.org/jmhale/alexa-nextbus)
+
+Develop:
+[![Build Status](https://travis-ci.org/jmhale/alexa-nextbus.svg?branch=develop)](https://travis-ci.org/jmhale/alexa-nextbus)
+
 This app provides real-time bus arrival information on a Amazon's Echo, using WMATA's public API.
 
 It is intended to be deployed as a Lambda function on AWS and uses DynamoDB to store users' home stop ID, based on their Amazon Echo user ID.
