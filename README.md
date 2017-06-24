@@ -2,6 +2,7 @@
 
 Master:
 [![Build Status](https://travis-ci.org/jmhale/alexa-nextbus.svg?branch=master)](https://travis-ci.org/jmhale/alexa-nextbus)
+
 Develop:
 [![Build Status](https://travis-ci.org/jmhale/alexa-nextbus.svg?branch=develop)](https://travis-ci.org/jmhale/alexa-nextbus)
 
