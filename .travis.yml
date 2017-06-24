@@ -2,7 +2,7 @@ language:
 - python
 python:
 - '2.7'
-install: true
+install: ignore
 script: ignore
 before_deploy: cd nextbus_alexa
 deploy:
