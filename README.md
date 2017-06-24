@@ -1,6 +1,9 @@
 # WMATA NextBus Predictor for Amazon's Echo
 
+Master:
 [![Build Status](https://travis-ci.org/jmhale/alexa-nextbus.svg?branch=master)](https://travis-ci.org/jmhale/alexa-nextbus)
+Develop:
+[![Build Status](https://travis-ci.org/jmhale/alexa-nextbus.svg?branch=develop)](https://travis-ci.org/jmhale/alexa-nextbus)
 
 This app provides real-time bus arrival information on a Amazon's Echo, using WMATA's public API.
 
