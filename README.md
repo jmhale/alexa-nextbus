@@ -13,8 +13,11 @@ Before the initial "Get stop" request is made, a home stop ID must be set, using
 
 Note that you will need the following environment variables to be set for the app to function:
 
-- `WMATA_API_KEY`: Your developer's API key from https://developer.wmata.com/
-- `ALEXA_APP_ID`: The ID of your Alexa application. This is found at https://developer.amazon.com/
+
+| Variable | Purpose |
+| --- | --- |
+| `WMATA_API_KEY` | Your developer's API key from https://developer.wmata.com/ |
+| `ALEXA_APP_ID` | The ID of your Alexa application. This is found at https://developer.amazon.com/ |
 
 If you save these env vars in your Lambda config, I highly recommend that you use KMS to encrypt them, as they are both potentially sensitive pieces of information.
 
