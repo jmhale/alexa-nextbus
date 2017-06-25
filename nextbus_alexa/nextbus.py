@@ -5,6 +5,7 @@ Lambda function for WMATA's NextBus
 """
 
 import os
+import re
 from base64 import b64decode
 from urllib2 import HTTPError
 from helpers import build_speechlet, build_event_response, build_response, \
@@ -101,7 +102,7 @@ def get_welcome_response(request, session):
         attributes = {"speech_output": intro}
         return build_response(attributes, build_reprompt(intro, reprompt_text, should_end_session))
 
-    arrivals = get_buses_response(stop_id)
+    arrivals, reprompt = get_buses_response(stop_id)
     intro = """
 <speak>
 Welcome to %s for Washington's Metro. \
@@ -130,11 +131,12 @@ def get_buses_response(stop_id):
         response = "I'm sorry. There was a problem accessing Metro's system. Please try again later."
         return response, False
 
-    stop_name = events['StopName']
-
     response = ''
+    stop_name = normalize_output(events['StopName'])
 
-    stop_name = normalize_output(stop_name)
+    if not events['Predictions']:
+        response = "I'm sorry, there are no buses scheduled for your stop at %s" % stop_name
+        return response, False
 
     response += "For the stop at %s: " % stop_name
 
@@ -159,7 +161,7 @@ def handle_get_buses_request(intent, session):
     arrivals, reprompt = get_buses_response(stop_id)
 
     if reprompt:
-        return build_response(attributes, build_speechlet(arrivals, False))
+        return build_response(attributes, build_reprompt(arrivals, "", False))
 
     return build_response(attributes, build_speechlet(arrivals, should_end_session))
 
@@ -167,20 +169,24 @@ def handle_set_home_stop_request(intent, session):
     """ Handles the request for set_home_stop intent """
     attributes = {}
     should_end_session = True
+    error_response = "I'm sorry. I didn't understand your stop id. Please say your seven-digit stop id again."
 
     user_id = session['user']['userId']
+    stopid_pattern = re.compile(r'^\d{7}$')
     try:
-        stop_id = intent['slots']['stop_id']['value']
+        if stopid_pattern.match(intent['slots']['stop_id']['value']):
+            stop_id = intent['slots']['stop_id']['value']
+        else:
+            return build_response(attributes, build_reprompt(error_response, "", False))
     except KeyError:
-        response = "I'm sorry. I didn't understand your stop id. Please try again"
-        return build_response(attributes, build_speechlet(response, False))
+        return build_response(attributes, build_reprompt(error_response, "", False))
 
     set_resp = set_home_stop(user_id, stop_id)
 
     if set_resp is not None:
         response = "There was a problem setting your home stop. Please try again later."
     else:
-        arrivals = get_buses_response(stop_id)
+        arrivals, reprompt = get_buses_response(stop_id)
         response = """
 <speak>
 Your home stop was set successfully to <say-as interpret-as="digits">%s</say-as>. \
