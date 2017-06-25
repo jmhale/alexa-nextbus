@@ -177,9 +177,9 @@ def handle_set_home_stop_request(intent, session):
         if stopid_pattern.match(intent['slots']['stop_id']['value']):
             stop_id = intent['slots']['stop_id']['value']
         else:
-            return build_response(attributes, build_speechlet(error_response, True))
+            return build_response(attributes, build_reprompt(error_response, "", False))
     except KeyError:
-        return build_response(attributes, build_speechlet(error_response, True))
+        return build_response(attributes, build_reprompt(error_response, "", False))
 
     set_resp = set_home_stop(user_id, stop_id)
 
