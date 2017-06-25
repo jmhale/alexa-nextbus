@@ -5,6 +5,7 @@ Lambda function for WMATA's NextBus
 """
 
 import os
+import re
 from base64 import b64decode
 from urllib2 import HTTPError
 from helpers import build_speechlet, build_event_response, build_response, \
@@ -168,13 +169,17 @@ def handle_set_home_stop_request(intent, session):
     """ Handles the request for set_home_stop intent """
     attributes = {}
     should_end_session = True
+    error_response = "I'm sorry. I didn't understand your stop id. Please try again"
 
     user_id = session['user']['userId']
+    stopid_pattern = re.compile(r'^\d{7}$')
     try:
-        stop_id = intent['slots']['stop_id']['value']
+        if stopid_pattern.match(intent['slots']['stop_id']['value']):
+            stop_id = intent['slots']['stop_id']['value']
+        else:
+            return build_response(attributes, build_speechlet(error_response, True))
     except KeyError:
-        response = "I'm sorry. I didn't understand your stop id. Please try again"
-        return build_response(attributes, build_speechlet(response, False))
+        return build_response(attributes, build_speechlet(error_response, True))
 
     set_resp = set_home_stop(user_id, stop_id)
 
