@@ -2,11 +2,18 @@
 Helper functions
 """
 
+import os
 import time
 import boto3
 from botocore.exceptions import ClientError
 
 DAYS_TO_KEEP = 90
+
+if "DYNAMODB_TABLE_NAME" in os.environ:
+    TABLE_NAME = os.environ['DYNAMODB_TABLE_NAME']
+else:
+    raise ValueError("No DynamoDB Table Name Provided. Please set the DYNAMODB_TABLE_NAME env var")
+
 
 def normalize_output(event_text):
     """ Normalizes the output to sound more natural """
@@ -88,7 +95,7 @@ def set_home_stop(user_id, stop_id):
     try:
         client = boto3.client('dynamodb')
         client.put_item(
-            TableName='alexa-nextbus',
+            TableName=TABLE_NAME,
             Item={
                 'userId': {'S':user_id},
                 'stopId': {'S':stop_id},
@@ -108,7 +115,7 @@ def get_home_stop(user_id):
     client = boto3.client('dynamodb')
     try:
         stop_id = client.get_item(
-            TableName='alexa-nextbus',
+            TableName=TABLE_NAME,
             Key={
                 'userId': {'S':user_id}
             }
@@ -123,7 +130,7 @@ def get_home_stop(user_id):
 
     try:
         client.update_item(
-            TableName='alexa-nextbus',
+            TableName=TABLE_NAME,
             Key={
                 'userId':{'S':user_id}
             },
