@@ -169,7 +169,7 @@ def handle_set_home_stop_request(intent, session):
     """ Handles the request for set_home_stop intent """
     attributes = {}
     should_end_session = True
-    error_response = "I'm sorry. I didn't understand your stop id. Please try again"
+    error_response = "I'm sorry. I didn't understand your stop id. Please say your seven-digit stop id again."
 
     user_id = session['user']['userId']
     stopid_pattern = re.compile(r'^\d{7}$')
