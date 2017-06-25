@@ -161,7 +161,7 @@ def handle_get_buses_request(intent, session):
     arrivals, reprompt = get_buses_response(stop_id)
 
     if reprompt:
-        return build_response(attributes, build_speechlet(arrivals, False))
+        return build_response(attributes, build_reprompt(arrivals, "", False))
 
     return build_response(attributes, build_speechlet(arrivals, should_end_session))
 
