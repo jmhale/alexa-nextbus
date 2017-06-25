@@ -130,11 +130,12 @@ def get_buses_response(stop_id):
         response = "I'm sorry. There was a problem accessing Metro's system. Please try again later."
         return response, False
 
-    stop_name = events['StopName']
-
     response = ''
+    stop_name = normalize_output(events['StopName'])
 
-    stop_name = normalize_output(stop_name)
+    if not events['Predictions']:
+        response = "I'm sorry, there are no buses scheduled for your stop at %s" % stop_name
+        return response, False
 
     response += "For the stop at %s: " % stop_name
 
