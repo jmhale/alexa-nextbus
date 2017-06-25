@@ -101,7 +101,7 @@ def get_welcome_response(request, session):
         attributes = {"speech_output": intro}
         return build_response(attributes, build_reprompt(intro, reprompt_text, should_end_session))
 
-    arrivals = get_buses_response(stop_id)
+    arrivals, reprompt = get_buses_response(stop_id)
     intro = """
 <speak>
 Welcome to %s for Washington's Metro. \
@@ -180,7 +180,7 @@ def handle_set_home_stop_request(intent, session):
     if set_resp is not None:
         response = "There was a problem setting your home stop. Please try again later."
     else:
-        arrivals = get_buses_response(stop_id)
+        arrivals, reprompt = get_buses_response(stop_id)
         response = """
 <speak>
 Your home stop was set successfully to <say-as interpret-as="digits">%s</say-as>. \
