@@ -170,3 +170,39 @@ def update_lastused(user_id):
 
     except KeyError as ex:
         print ex
+
+def update_call_count(user_id):
+    """ Sets or updates the callCount counter """
+    client = boto3.client('dynamodb')
+    call_count = 0
+
+    try:
+        call_count = client.get_item(
+            TableName=TABLE_NAME,
+            Key={
+                'userId': {'S':user_id}
+            }
+        )['Item']['callCount']['N']
+    except ClientError as ex:
+        print ex.response
+
+    except KeyError as ex:
+        print ex
+
+    call_count = call_count + 1
+    try:
+        client.update_item(
+            TableName=TABLE_NAME,
+            Key={
+                'userId':{'S':user_id}
+            },
+            UpdateExpression="set callCount = :t",
+            ExpressionAttributeValues={
+                ':t': {'N':call_count}
+            }
+        )
+    except ClientError as ex:
+        print ex
+
+    except KeyError as ex:
+        print ex
