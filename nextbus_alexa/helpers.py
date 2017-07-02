@@ -177,12 +177,12 @@ def update_call_count(user_id):
     call_count = 0
 
     try:
-        call_count = client.get_item(
+        call_count = int(client.get_item(
             TableName=TABLE_NAME,
             Key={
                 'userId': {'S':user_id}
             }
-        )['Item']['callCount']['N']
+        )['Item']['callCount']['N'])
     except ClientError as ex:
         print ex.response
 
