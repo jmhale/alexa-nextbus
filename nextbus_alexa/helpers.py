@@ -148,3 +148,61 @@ def get_home_stop(user_id):
         return -1
 
     return stop_id
+
+def update_lastused(user_id):
+    """ Sets or updates the lastUsed timestamp """
+    last_used = str(time.time()).split('.')[0]
+    client = boto3.client('dynamodb')
+
+    try:
+        client.update_item(
+            TableName=TABLE_NAME,
+            Key={
+                'userId':{'S':user_id}
+            },
+            UpdateExpression="set lastUsed = :t",
+            ExpressionAttributeValues={
+                ':t': {'N':last_used}
+            }
+        )
+    except ClientError as ex:
+        print ex.response
+
+    except KeyError as ex:
+        print ex
+
+def update_call_count(user_id):
+    """ Sets or updates the callCount counter """
+    client = boto3.client('dynamodb')
+    call_count = 0
+
+    try:
+        call_count = int(client.get_item(
+            TableName=TABLE_NAME,
+            Key={
+                'userId': {'S':user_id}
+            }
+        )['Item']['callCount']['N'])
+    except ClientError as ex:
+        print ex.response
+
+    except KeyError as ex:
+        print ex
+
+    call_count = str(call_count + 1)
+    try:
+        client.update_item(
+            TableName=TABLE_NAME,
+            Key={
+                'userId':{'S':user_id}
+            },
+            UpdateExpression="set callCount = :t",
+            ExpressionAttributeValues={
+                ':t': {'N':call_count}
+            }
+        )
+    except ClientError as ex:
+        print ex
+
+    except KeyError as ex:
+        print ex

@@ -9,7 +9,8 @@ import re
 from base64 import b64decode
 from urllib2 import HTTPError
 from helpers import build_speechlet, build_event_response, build_response, \
-    get_home_stop, set_home_stop, normalize_output, build_reprompt
+    get_home_stop, set_home_stop, normalize_output, build_reprompt, update_lastused, \
+    update_call_count
 import wmata_api as api
 import boto3
 
@@ -153,6 +154,8 @@ def handle_get_buses_request(intent, session):
 
     user_id = session['user']['userId']
     stop_id = get_home_stop(user_id)
+    update_lastused(user_id)
+    update_call_count(user_id)
 
     if stop_id == -1:
         response = NO_STOP_MESSAGE
