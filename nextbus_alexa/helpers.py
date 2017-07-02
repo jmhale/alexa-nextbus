@@ -148,3 +148,25 @@ def get_home_stop(user_id):
         return -1
 
     return stop_id
+
+def update_lastused(user_id):
+    """ Sets or updates the lastUsed timestamp """
+    last_used = str(time.time()).split('.')[0]
+    client = boto3.client('dynamodb')
+
+    try:
+        client.update_item(
+            TableName=TABLE_NAME,
+            Key={
+                'userId':{'S':user_id}
+            },
+            UpdateExpression="set lastUsed = :t",
+            ExpressionAttributeValues={
+                ':t': {'N':last_used}
+            }
+        )
+    except ClientError as ex:
+        print ex.response
+
+    except KeyError as ex:
+        print ex
