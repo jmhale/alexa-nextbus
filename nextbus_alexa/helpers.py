@@ -189,7 +189,7 @@ def update_call_count(user_id):
     except KeyError as ex:
         print ex
 
-    call_count = call_count + 1
+    call_count = str(call_count + 1)
     try:
         client.update_item(
             TableName=TABLE_NAME,
