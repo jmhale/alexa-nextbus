@@ -27,7 +27,8 @@ def get_events(stop_id):
 
 
     api_url = "%sNextBusService.svc/json/jPredictions?api_key=%s&StopID=%s" \
-            % (API_ENDPOINT, api_key, stop_id)
+            % (API_ENDPOINT, api_key.decode('UTF-8'), stop_id)
+    print(api_url)
 
     req = urllib.request.Request(api_url)
     return json.loads(urllib.request.urlopen(req).read())
