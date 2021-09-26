@@ -8,10 +8,10 @@ import os
 import re
 from base64 import b64decode
 from urllib.error import HTTPError
-from .helpers import build_speechlet, build_event_response, build_response, \
+from nextbusalexa.helpers import build_speechlet, build_event_response, build_response, \
     get_home_stop, set_home_stop, normalize_output, build_reprompt, update_lastused, \
     update_call_count
-import wmata_api as api
+import nextbusalexa.wmata_api as api
 import boto3
 
 NUM_BUSES = 5
