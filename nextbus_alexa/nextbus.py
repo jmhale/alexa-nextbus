@@ -29,18 +29,18 @@ EXIT_MESSAGE = "Thank you for using bus predictor. Goodbye!"
 
 def lambda_handler(event, context):
     """ Default entrypoint for Lambda function """
-    print(("event.session.application.applicationId=" +
-          event['session']['application']['applicationId']))
+    event_app_id = event['session']['application']['applicationId'].encode()
+    print("event.session.application.applicationId=%s" % event_app_id)
 
     if "ALEXA_APP_ID" in os.environ:
         encrypted_app_id = os.environ['ALEXA_APP_ID']
         app_id = boto3.client('kms').decrypt(
-            CiphertextBlob=b64decode(encrypted_app_id)
+            CiphertextBlob=bytes(b64decode(encrypted_app_id))
         )['Plaintext']
     else:
         raise ValueError("Alexa app ID not provided. Cannot continue.")
 
-    if event['session']['application']['applicationId'] != app_id:
+    if event_app_id != app_id:
         raise ValueError("Invalid Application ID")
 
     if event['session']['new']:
