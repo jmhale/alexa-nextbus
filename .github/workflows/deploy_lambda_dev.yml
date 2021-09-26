@@ -1,9 +1,5 @@
 name: Deploy develop Lambda function
 
-defaults:
-  run:
-    working-directory: nextbus_alexa
-
 on:
   push:
     branches: [ develop ]
@@ -15,6 +11,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./nextbus_alexa
 
     steps:
       - uses: actions/checkout@v2
