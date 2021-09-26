@@ -1,0 +1,28 @@
+name: Deploy production Lambda function
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./nextbus_alexa
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Deploy code to Lambda
+        uses: jmhale/lambda-python-action@main
+        with:
+          lambda_function_name: ${{ secrets.LAMBDA_FUNCTION_NAME_PROD }}
+          lambda_region: ${{ secrets.LAMBDA_REGION }}
+          lambda_payload_dir: "nextbus_alexa"
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
