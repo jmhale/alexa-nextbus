@@ -7,11 +7,11 @@ Lambda function for WMATA's NextBus
 import os
 import re
 from base64 import b64decode
-from urllib2 import HTTPError
-from helpers import build_speechlet, build_event_response, build_response, \
+from urllib.error import HTTPError
+from .helpers import build_speechlet, build_event_response, build_response, \
     get_home_stop, set_home_stop, normalize_output, build_reprompt, update_lastused, \
     update_call_count
-import wmata_api as api
+from . import wmata_api as api
 import boto3
 
 NUM_BUSES = 5
@@ -29,8 +29,8 @@ EXIT_MESSAGE = "Thank you for using bus predictor. Goodbye!"
 
 def lambda_handler(event, context):
     """ Default entrypoint for Lambda function """
-    print("event.session.application.applicationId=" +
-          event['session']['application']['applicationId'])
+    print(("event.session.application.applicationId=" +
+          event['session']['application']['applicationId']))
 
     if "ALEXA_APP_ID" in os.environ:
         encrypted_app_id = os.environ['ALEXA_APP_ID']
@@ -56,29 +56,29 @@ def lambda_handler(event, context):
 
 def on_session_started(session_started_request, session):
     """Called when the session starts."""
-    print("on_session_started requestId=" +
+    print(("on_session_started requestId=" +
           session_started_request['requestId'] + ", sessionId=" +
-          session['sessionId'])
+          session['sessionId']))
 
 def on_launch(request, session):
     """Called when the user launches the skill without specifying what they want."""
-    print("on_launch requestId=" + request['requestId'] +
-          ", sessionId=" + session['sessionId'])
+    print(("on_launch requestId=" + request['requestId'] +
+          ", sessionId=" + session['sessionId']))
 
-    print "request: %s" % request
+    print("request: %s" % request)
     resp = get_welcome_response(request, session)
-    print "response: %s" % resp
+    print("response: %s" % resp)
     return resp
 
 def on_intent(request, session):
     """Called when the user specifies an intent for this skill."""
-    print("on_intent requestId=" + request['requestId'] +
-          ", sessionId=" + session['sessionId'])
+    print(("on_intent requestId=" + request['requestId'] +
+          ", sessionId=" + session['sessionId']))
 
     intent = request['intent']
     intent_name = request['intent']['name']
 
-    print intent_name
+    print(intent_name)
 
     if intent_name == "GetBusesIntent":
         return handle_get_buses_request(intent, session)
@@ -117,8 +117,8 @@ Here are your stop's arrival times: %s
 
 def on_session_ended(request, session):
     """ Called when session is explicitly ended by the user """
-    print("on_session_ended requestId=" + request['requestId'] +
-          ", sessionId=" + session['sessionId'])
+    print(("on_session_ended requestId=" + request['requestId'] +
+          ", sessionId=" + session['sessionId']))
 
 def get_buses_response(stop_id):
     """ Build a get buses response for a stop id """

@@ -4,7 +4,7 @@ Provides helper functions for dealing with the WMATA API
 """
 
 import os
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import json
 from base64 import b64decode
 import boto3
@@ -29,5 +29,5 @@ def get_events(stop_id):
     api_url = "%sNextBusService.svc/json/jPredictions?api_key=%s&StopID=%s" \
             % (API_ENDPOINT, api_key, stop_id)
 
-    req = urllib2.Request(api_url)
-    return json.loads(urllib2.urlopen(req).read())
+    req = urllib.request.Request(api_url)
+    return json.loads(urllib.request.urlopen(req).read())

@@ -103,7 +103,7 @@ def set_home_stop(user_id, stop_id):
             }
         )
     except ClientError as ex:
-        print ex.response
+        print(ex.response)
         return ex.response['Error']['Code']
 
     return None
@@ -121,11 +121,11 @@ def get_home_stop(user_id):
             }
         )['Item']['stopId']['S']
     except ClientError as ex:
-        print ex.response
+        print(ex.response)
         return ex.response['Error']['Code']
 
     except KeyError as ex:
-        print ex
+        print(ex)
         return -1
 
     try:
@@ -140,11 +140,11 @@ def get_home_stop(user_id):
             }
         )
     except ClientError as ex:
-        print ex.response
+        print(ex.response)
         return ex.response['Error']['Code']
 
     except KeyError as ex:
-        print ex
+        print(ex)
         return -1
 
     return stop_id
@@ -166,10 +166,10 @@ def update_lastused(user_id):
             }
         )
     except ClientError as ex:
-        print ex.response
+        print(ex.response)
 
     except KeyError as ex:
-        print ex
+        print(ex)
 
 def update_call_count(user_id):
     """ Sets or updates the callCount counter """
@@ -184,10 +184,10 @@ def update_call_count(user_id):
             }
         )['Item']['callCount']['N'])
     except ClientError as ex:
-        print ex.response
+        print(ex.response)
 
     except KeyError as ex:
-        print ex
+        print(ex)
 
     call_count = str(call_count + 1)
     try:
@@ -202,7 +202,7 @@ def update_call_count(user_id):
             }
         )
     except ClientError as ex:
-        print ex
+        print(ex)
 
     except KeyError as ex:
-        print ex
+        print(ex)
